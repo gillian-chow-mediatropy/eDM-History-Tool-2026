@@ -8,6 +8,7 @@ const MONTHS = [
 ];
 
 let currentYear = null;
+let currentMonth = "all";
 
 // ---- Navigation ----
 
@@ -15,107 +16,174 @@ function showLanding() {
     document.getElementById("landing").classList.remove("hidden");
     document.getElementById("yearView").classList.add("hidden");
     document.getElementById("navbar").classList.add("nav-hidden");
-    document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
     window.scrollTo(0, 0);
     currentYear = null;
-    closeMobileMenu();
+    currentMonth = "all";
+    sessionStorage.removeItem("edm_year");
 }
 
 function loadYear(year) {
+    if (!DATA_LOADED) {
+        showLoading("Loading data from Smartsheet...");
+        const check = setInterval(() => {
+            if (DATA_LOADED) {
+                clearInterval(check);
+                hideLoading();
+                loadYear(year);
+            }
+        }, 500);
+        return;
+    }
+
     currentYear = year;
+    currentMonth = "all";
+    sessionStorage.setItem("edm_year", String(year));
 
     document.getElementById("landing").classList.add("hidden");
     document.getElementById("yearView").classList.remove("hidden");
     document.getElementById("navbar").classList.remove("nav-hidden");
 
-    // Set year dropdown
+    populateYearFilter();
     document.getElementById("yearFilter").value = String(year);
 
-    // Highlight active nav link
-    document.querySelectorAll(".nav-link").forEach(link => {
-        link.classList.toggle("active", link.textContent.trim() === String(year));
-    });
-
     populateFilters();
+    updateMonthPills();
     applyFilters();
     window.scrollTo(0, 0);
-    closeMobileMenu();
 }
 
 function onYearFilterChange() {
     const year = parseInt(document.getElementById("yearFilter").value);
     currentYear = year;
-
-    // Highlight active nav link
-    document.querySelectorAll(".nav-link").forEach(link => {
-        link.classList.toggle("active", link.textContent.trim() === String(year));
-    });
+    currentMonth = "all";
 
     populateFilters();
+    updateMonthPills();
     applyFilters();
+}
+
+// ---- Loading Indicator ----
+
+function showLoading(message) {
+    let loader = document.getElementById("dataLoader");
+    if (!loader) {
+        loader = document.createElement("div");
+        loader.id = "dataLoader";
+        loader.className = "data-loader";
+        document.body.appendChild(loader);
+    }
+    loader.textContent = message || "Loading...";
+    loader.classList.remove("hidden");
+}
+
+function hideLoading() {
+    const loader = document.getElementById("dataLoader");
+    if (loader) loader.classList.add("hidden");
+}
+
+// ---- Month Pills ----
+
+function selectMonth(month) {
+    currentMonth = month;
+    updateMonthPills();
+    applyFilters();
+}
+
+function updateMonthPills() {
+    const emails = EMAIL_DATA[currentYear] || [];
+    const monthsWithData = new Set(emails.map(e => e.month));
+
+    document.querySelectorAll(".month-pill").forEach(pill => {
+        const m = pill.getAttribute("data-month");
+        pill.classList.toggle("active", m === currentMonth);
+
+        // Dim months with no data (except "All")
+        if (m !== "all") {
+            pill.classList.toggle("month-pill-empty", !monthsWithData.has(m));
+        }
+    });
+}
+
+// ---- Year Dropdown ----
+
+function populateYearFilter() {
+    const yearFilter = document.getElementById("yearFilter");
+    const dataYears = Object.keys(EMAIL_DATA).map(Number);
+    const currentCalendarYear = new Date().getFullYear();
+    const maxYear = Math.max(2026, currentCalendarYear, ...dataYears);
+
+    const years = [];
+    for (let y = maxYear; y >= 2026; y--) {
+        years.push(y);
+    }
+
+    const prevValue = yearFilter.value;
+    yearFilter.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join("");
+
+    // Restore previous selection if still valid
+    if (years.includes(parseInt(prevValue))) {
+        yearFilter.value = prevValue;
+    }
 }
 
 // ---- Filters ----
 
 function populateFilters() {
     const emails = EMAIL_DATA[currentYear] || [];
+    const areaFilter = document.getElementById("areaFilter");
     const marketFilter = document.getElementById("marketFilter");
-    const monthFilter = document.getElementById("monthFilter");
 
-    // Preserve current selections if possible
+    const prevArea = areaFilter.value;
     const prevMarket = marketFilter.value;
-    const prevMonth = monthFilter.value;
 
-    // Get unique markets sorted
-    const markets = [...new Set(emails.map(e => e.market))].sort();
+    // Areas
+    const areas = [...new Set(emails.map(e => e.area).filter(Boolean))].sort();
+    areaFilter.innerHTML = '<option value="all">All Areas</option>';
+    areas.forEach(a => {
+        areaFilter.innerHTML += `<option value="${a}">${a}</option>`;
+    });
+
+    // Markets
+    const markets = [...new Set(emails.map(e => e.targetMarket).filter(Boolean))].sort();
     marketFilter.innerHTML = '<option value="all">All Markets</option>';
     markets.forEach(m => {
         marketFilter.innerHTML += `<option value="${m}">${m}</option>`;
     });
 
-    // Get unique months in calendar order
-    const monthsPresent = [...new Set(emails.map(e => e.month))];
-    monthsPresent.sort((a, b) => MONTHS.indexOf(a) - MONTHS.indexOf(b));
-    monthFilter.innerHTML = '<option value="all">All Months</option>';
-    monthsPresent.forEach(m => {
-        monthFilter.innerHTML += `<option value="${m}">${m}</option>`;
-    });
-
-    // Restore selections if they still exist
-    if ([...marketFilter.options].some(o => o.value === prevMarket)) {
-        marketFilter.value = prevMarket;
-    }
-    if ([...monthFilter.options].some(o => o.value === prevMonth)) {
-        monthFilter.value = prevMonth;
-    }
+    // Restore
+    if ([...areaFilter.options].some(o => o.value === prevArea)) areaFilter.value = prevArea;
+    if ([...marketFilter.options].some(o => o.value === prevMarket)) marketFilter.value = prevMarket;
 }
 
 function applyFilters() {
     const emails = EMAIL_DATA[currentYear] || [];
+    const area = document.getElementById("areaFilter").value;
     const market = document.getElementById("marketFilter").value;
-    const month = document.getElementById("monthFilter").value;
     const search = document.getElementById("searchInput").value.toLowerCase().trim();
 
     // Highlight active dropdowns
-    document.getElementById("yearFilter").classList.toggle("filter-active", false);
+    document.getElementById("areaFilter").classList.toggle("filter-active", area !== "all");
     document.getElementById("marketFilter").classList.toggle("filter-active", market !== "all");
-    document.getElementById("monthFilter").classList.toggle("filter-active", month !== "all");
 
     // Show/hide search clear button
     document.getElementById("searchClear").classList.toggle("hidden", !search);
 
     const filtered = emails.filter(e => {
-        if (market !== "all" && e.market !== market) return false;
-        if (month !== "all" && e.month !== month) return false;
+        if (area !== "all" && e.area !== area) return false;
+        if (market !== "all" && e.targetMarket !== market) return false;
+        if (currentMonth !== "all" && e.month !== currentMonth) return false;
         if (search) {
             const searchableText = [
-                e.id,
-                e.title,
-                e.subject || "",
-                e.bodyCopy || "",
-                e.market,
+                e.requestId,
+                e.campaignName,
+                e.campaignDescription || "",
+                e.area,
+                e.targetMarket || "",
+                e.additionalTargetMarkets || "",
                 e.month,
-                e.sendDate || ""
+                e.earliestDeploymentDate || "",
+                e.campaignType || "",
+                e.emailTemplate || ""
             ].join(" ").toLowerCase();
             if (!searchableText.includes(search)) return false;
         }
@@ -123,14 +191,16 @@ function applyFilters() {
     });
 
     renderEmails(filtered, search);
-    renderFilterSummary(market, month, search, filtered.length, emails.length);
+    renderFilterSummary(area, market, search, filtered.length, emails.length);
     renderResultsHeader(filtered.length);
 }
 
 function resetFilters() {
+    document.getElementById("areaFilter").value = "all";
     document.getElementById("marketFilter").value = "all";
-    document.getElementById("monthFilter").value = "all";
     document.getElementById("searchInput").value = "";
+    currentMonth = "all";
+    updateMonthPills();
     applyFilters();
 }
 
@@ -141,23 +211,27 @@ function clearSearch() {
 }
 
 function removeFilter(type) {
+    if (type === "area") document.getElementById("areaFilter").value = "all";
     if (type === "market") document.getElementById("marketFilter").value = "all";
-    if (type === "month") document.getElementById("monthFilter").value = "all";
+    if (type === "month") { currentMonth = "all"; updateMonthPills(); }
     if (type === "search") document.getElementById("searchInput").value = "";
     applyFilters();
 }
 
 // ---- Filter Summary (active filter pills) ----
 
-function renderFilterSummary(market, month, search, count, total) {
+function renderFilterSummary(area, market, search, count, total) {
     const container = document.getElementById("filterSummary");
     const pills = [];
 
+    if (currentMonth !== "all") {
+        pills.push(makePill("Month: " + currentMonth, "month"));
+    }
+    if (area !== "all") {
+        pills.push(makePill("Area: " + area, "area"));
+    }
     if (market !== "all") {
         pills.push(makePill("Market: " + market, "market"));
-    }
-    if (month !== "all") {
-        pills.push(makePill("Month: " + month, "month"));
     }
     if (search) {
         pills.push(makePill('Search: "' + escapeHtml(search) + '"', "search"));
@@ -187,16 +261,19 @@ function renderResultsHeader(count) {
 
 // ---- Rendering ----
 
-function getMarketClass(market) {
+function getAreaClass(area) {
+    const code = (area || "").split(" ")[0].toLowerCase();
     const map = {
-        "US/Canada": "market-us-canada",
-        "CALA": "market-cala",
-        "EMEA": "market-emea",
-        "APAC": "market-apac",
-        "Core": "market-core",
-        "LUX": "market-lux"
+        "anzp": "area-anzp",
+        "apec": "area-apec",
+        "gc": "area-gc",
+        "im": "area-im",
+        "jpg": "area-jpg",
+        "sa": "area-sa",
+        "skpv": "area-skpv",
+        "sm": "area-sm"
     };
-    return map[market] || "market-other";
+    return map[code] || "area-other";
 }
 
 function highlightText(text, search) {
@@ -205,6 +282,13 @@ function highlightText(text, search) {
     const searchEscaped = escapeHtml(search);
     const regex = new RegExp(`(${searchEscaped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, "gi");
     return escaped.replace(regex, '<span class="search-highlight">$1</span>');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
 function renderEmails(emails, search) {
@@ -226,7 +310,6 @@ function renderEmails(emails, search) {
         grouped[e.month].push(e);
     });
 
-    // Sort months in calendar order
     const sortedMonths = Object.keys(grouped).sort(
         (a, b) => MONTHS.indexOf(a) - MONTHS.indexOf(b)
     );
@@ -245,36 +328,43 @@ function renderEmails(emails, search) {
         `;
 
         monthEmails.forEach(email => {
-            const displayId = email.id.replace(/[a-z]$/, "");
-            const subjectDisplay = email.subject ? highlightText(email.subject, search) : "";
-            const titleDisplay = highlightText(email.title, search);
-            const marketDisplay = highlightText(email.market, search);
+            const nameDisplay = highlightText(email.campaignName || "Untitled", search);
+            const areaDisplay = highlightText(email.area || "", search);
+            const descDisplay = email.campaignDescription ? highlightText(email.campaignDescription, search) : "";
+            const deployDate = formatDate(email.earliestDeploymentDate) || formatDate(email.latestDeploymentDate) || "";
+            const hasPreview = email.previewLink && email.previewLink.trim() !== "" && !email._brokenPreview;
+
+            const previewPageUrl = hasPreview ? `preview.html?url=${encodeURIComponent(email.previewLink)}&id=${encodeURIComponent(email.requestId || "")}&name=${encodeURIComponent(email.campaignName || "")}` : "";
 
             html += `
             <div class="email-card">
                 <div class="card-previews">
-                    <a href="${email.approvedUrl}" target="_blank" rel="noopener">
+                    ${hasPreview ? `<a href="${previewPageUrl}">` : "<div>"}
                         <div class="preview-mobile">
-                            <iframe src="${email.previewUrl}" loading="lazy" sandbox="allow-same-origin" title="Mobile preview of MAR-${displayId}"></iframe>
+                            ${hasPreview ? `<iframe src="${email.previewLink}" loading="lazy" sandbox="allow-same-origin" title="Mobile preview of ${email.requestId}"></iframe>` : `<div class="preview-placeholder">No Preview</div>`}
                         </div>
                         <div class="preview-tablet">
-                            <iframe src="${email.previewUrl}" loading="lazy" sandbox="allow-same-origin" title="Tablet preview of MAR-${displayId}"></iframe>
+                            ${hasPreview ? `<iframe src="${email.previewLink}" loading="lazy" sandbox="allow-same-origin" title="Tablet preview of ${email.requestId}"></iframe>` : `<div class="preview-placeholder">No Preview Available</div>`}
                         </div>
-                        <div class="card-hover-overlay">
-                            <span>View Email</span>
-                        </div>
-                    </a>
+                        ${hasPreview ? `<div class="card-hover-overlay"><span>View Email</span></div>` : ""}
+                    ${hasPreview ? "</a>" : "</div>"}
                 </div>
                 <div class="card-body">
-                    <div class="card-id">MAR-${displayId}</div>
-                    <div class="card-title">${titleDisplay}</div>
-                    ${subjectDisplay ? `<div class="card-subject"><strong>Subject:</strong> ${subjectDisplay}</div>` : ""}
-                    ${email.sendDate ? `<div class="card-send-date"><strong>Send Date:</strong> ${highlightText(email.sendDate, search)}</div>` : ""}
-                    <span class="card-market-tag ${getMarketClass(email.market)}">${marketDisplay}</span>
+                    <div class="card-id">${highlightText(email.requestId || "", search)}</div>
+                    <div class="card-title">${nameDisplay}</div>
+                    ${descDisplay ? `<div class="card-description"><strong>Description:</strong> ${descDisplay}</div>` : ""}
+                    ${deployDate ? `<div class="card-send-date"><strong>Deployment:</strong> ${highlightText(deployDate, search)}</div>` : ""}
+                    ${email.campaignType ? `<div class="card-meta"><strong>Type:</strong> ${highlightText(email.campaignType, search)}</div>` : ""}
+                    ${email.campaignGoal ? `<div class="card-meta"><strong>Goal:</strong> ${highlightText(email.campaignGoal, search)}</div>` : ""}
+                    ${email.emailTemplate ? `<div class="card-meta"><strong>Template:</strong> ${highlightText(email.emailTemplate, search)}</div>` : ""}
+                    ${email.targetLanguage ? `<div class="card-meta"><strong>Language:</strong> ${highlightText(email.targetLanguage, search)}</div>` : ""}
+                    <div class="card-tags">
+                        <span class="card-area-tag ${getAreaClass(email.area)}">${areaDisplay}</span>
+                        ${email.targetMarket ? `<span class="card-market-tag market-target">${highlightText(email.targetMarket, search)}</span>` : ""}
+                    </div>
+                    ${email.additionalTargetMarkets ? `<div class="card-meta card-meta-small"><strong>Additional Markets:</strong> ${highlightText(email.additionalTargetMarkets, search)}</div>` : ""}
                     <div class="card-links">
-                        ${email.trackerUrl ? `<a href="${email.trackerUrl}" target="_blank" rel="noopener" class="card-link">Message Tracker</a>` : ""}
-                        <a href="${email.approvedUrl}" target="_blank" rel="noopener" class="card-link">Approved</a>
-                        <a href="${email.previewUrl}" target="_blank" rel="noopener" class="card-link card-link-html">View HTML</a>
+                        ${hasPreview ? `<a href="${previewPageUrl}" class="card-link">View Email</a>` : `<span class="card-link card-link-disabled">No Preview</span>`}
                     </div>
                 </div>
             </div>`;
@@ -294,17 +384,6 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
-
-// ---- Mobile Menu ----
-
-function toggleMobileMenu() {
-    document.getElementById("navLinks").classList.toggle("open");
-}
-
-function closeMobileMenu() {
-    document.getElementById("navLinks").classList.remove("open");
-}
-
 // ---- Scroll Effects ----
 
 window.addEventListener("scroll", () => {
@@ -322,13 +401,11 @@ function scrollToTop() {
 // ---- Keyboard Shortcut ----
 
 document.addEventListener("keydown", (e) => {
-    // Focus search on "/" key (when not already in an input)
     if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "SELECT") {
         e.preventDefault();
         const searchInput = document.getElementById("searchInput");
         if (searchInput) searchInput.focus();
     }
-    // Escape clears search
     if (e.key === "Escape" && document.activeElement.id === "searchInput") {
         clearSearch();
         document.activeElement.blur();
@@ -336,18 +413,6 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ---- Password Gate ----
-
-const SITE_PASS_HASH = "a3c2f8d1e9b74650"; // hashed "MT2026!"
-
-function hashPassword(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash |= 0;
-    }
-    return Math.abs(hash).toString(16);
-}
 
 function checkPassword() {
     const input = document.getElementById("gatePassword").value;
@@ -358,20 +423,47 @@ function checkPassword() {
         const card = document.querySelector(".gate-card");
         error.classList.remove("hidden");
         card.classList.remove("gate-shake");
-        void card.offsetWidth; // trigger reflow
+        void card.offsetWidth;
         card.classList.add("gate-shake");
     }
     return false;
 }
 
 function unlockSite() {
+    sessionStorage.setItem("edm_auth", "1");
     document.getElementById("passwordGate").classList.add("hidden");
     document.getElementById("siteContent").classList.remove("hidden");
-    showLanding();
+    restoreView();
+}
+
+function restoreView() {
+    const savedYear = sessionStorage.getItem("edm_year");
+    if (savedYear) {
+        loadYear(parseInt(savedYear));
+    } else {
+        showLanding();
+    }
+}
+
+function logout() {
+    sessionStorage.removeItem("edm_auth");
+    sessionStorage.removeItem("edm_year");
+    document.getElementById("siteContent").classList.add("hidden");
+    document.getElementById("passwordGate").classList.remove("hidden");
+    document.getElementById("gatePassword").value = "";
+    document.getElementById("gateError").classList.add("hidden");
+    document.getElementById("gatePassword").focus();
+    currentYear = null;
 }
 
 // ---- Init ----
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("gatePassword").focus();
+    if (sessionStorage.getItem("edm_auth") === "1") {
+        document.getElementById("passwordGate").classList.add("hidden");
+        document.getElementById("siteContent").classList.remove("hidden");
+        restoreView();
+    } else {
+        document.getElementById("gatePassword").focus();
+    }
 });
