@@ -239,7 +239,7 @@ function renderEmails(emails, search) {
 
         html += `
         <section class="month-section" id="${monthId}">
-            <h3 class="month-heading">${month}</h3>
+            <h3 class="month-heading">${month}: ${currentYear}</h3>
             <p class="month-count">${monthEmails.length} email${monthEmails.length !== 1 ? "s" : ""}</p>
             <div class="email-grid">
         `;
