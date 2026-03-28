@@ -73,11 +73,11 @@ Make sure the Smartsheet API token is set as an environment variable in **Netlif
 
 ### Data Flow
 
-1. On page load, `data.js` checks `localStorage` for cached data
-2. If cache is valid (< 24 hours), it loads instantly and checks for updates in the background
-3. If cache is expired or missing, it fetches all data from Smartsheet via the `smartsheet` Netlify Function
-4. Only rows with status **"Deployed"** and year **>= 2026** are included
-5. Preview URLs are validated via the `check-url` function — broken links are flagged
+1. On page load, `data.js` checks `localStorage` for cached data.
+2. If cache is valid (< 24 hours), it loads instantly and checks for updates in the background.
+3. If cache is expired or missing, it fetches all data from Smartsheet via the `smartsheet` Netlify Function.
+4. Only rows with status **"Deployed"** and year **>= 2026** are included.
+5. Preview URLs are validated via the `check-url` function — broken links are flagged.
 
 ### Smartsheet Field Mapping
 
