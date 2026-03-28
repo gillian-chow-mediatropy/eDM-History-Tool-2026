@@ -70,7 +70,7 @@ Push to the connected Git branch — Netlify auto-deploys on push.
 Make sure the Smartsheet API token is set as an environment variable in **Netlify > Site settings > Environment variables** if it's not hardcoded in the function.
 
 ## How It Works
-
+ 
 ### Data Flow
 
 1. On page load, `data.js` checks `localStorage` for cached data
