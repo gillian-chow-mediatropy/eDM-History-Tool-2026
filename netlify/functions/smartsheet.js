@@ -1,7 +1,7 @@
 const https = require("https");
 
-const SHEET_ID = "36354399725444";
-const API_TOKEN = "9RvcG30JAo8e6PDTVSxU0wYcQVpDUVzTnzSf6";
+const SHEET_ID = process.env.SMARTSHEET_SHEET_ID || "36354399725444";
+const API_TOKEN = process.env.SMARTSHEET_API_TOKEN;
 
 // Only request the columns we need
 const COLUMN_IDS = [
@@ -14,6 +14,17 @@ const COLUMN_IDS = [
 ].join(",");
 
 exports.handler = async function (event) {
+    if (!API_TOKEN) {
+        return {
+            statusCode: 500,
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            body: JSON.stringify({ error: "Missing SMARTSHEET_API_TOKEN" })
+        };
+    }
+
     const params = event.queryStringParameters || {};
     const page = params.page || "1";
     const pageSize = params.pageSize || "500";

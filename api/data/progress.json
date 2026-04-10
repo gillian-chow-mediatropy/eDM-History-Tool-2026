@@ -1,0 +1,584 @@
+{
+  "dataVersion": 37,
+  "title": "eDM Marriott Email Tools - Development Progress",
+  "badge": "TEMPORARY",
+  "description": "Internal tracker for build execution. Focused on major delivery items only.",
+  "lastUpdated": "2026-04-10",
+  "timeline": {
+    "timezone": "Asia/Jakarta",
+    "meetingCheckpoint": {
+      "title": "Friday Morning Daily Meeting",
+      "dateTime": "2026-04-10T09:00:00+07:00"
+    },
+    "milestones": [
+      {
+        "id": "pre-step-0-window",
+        "title": "Pre-Step 0 - Platform Revamp Window",
+        "owner": "Mediatropy",
+        "startDate": "2026-04-08",
+        "endDate": "2026-04-10"
+      },
+      {
+        "id": "pre-step-1-window",
+        "title": "Pre-Step 1 - Template Preparation Window",
+        "owner": "Mediatropy + Markets",
+        "startDate": "2026-04-08",
+        "endDate": "2026-04-10"
+      },
+      {
+        "id": "platform-build",
+        "title": "Platform Build",
+        "owner": "Mediatropy",
+        "startDate": "2026-04-09",
+        "endDate": "2026-04-17"
+      },
+      {
+        "id": "uat-round-1",
+        "title": "External UAT - Round 1",
+        "owner": "Marriott",
+        "startDate": "2026-04-20",
+        "endDate": "2026-04-24"
+      },
+      {
+        "id": "fix-round-1",
+        "title": "Fixes & Refinement - Round 1",
+        "owner": "Mediatropy",
+        "startDate": "2026-04-27",
+        "endDate": "2026-04-30"
+      },
+      {
+        "id": "uat-round-2",
+        "title": "External UAT - Round 2",
+        "owner": "Marriott",
+        "startDate": "2026-05-04",
+        "endDate": "2026-05-08"
+      },
+      {
+        "id": "fix-round-2",
+        "title": "Fixes & Refinement - Round 2",
+        "owner": "Mediatropy",
+        "startDate": "2026-05-11",
+        "endDate": "2026-05-15"
+      },
+      {
+        "id": "final-review",
+        "title": "Final Review & Approval",
+        "owner": "Marriott",
+        "startDate": "2026-05-18",
+        "endDate": "2026-05-22"
+      },
+      {
+        "id": "launch",
+        "title": "Platform Launch (Password Protected)",
+        "owner": "Mediatropy",
+        "startDate": "2026-05-25",
+        "endDate": "2026-05-25"
+      }
+    ]
+  },
+  "brief": {
+    "personalizationFields": [
+      "Member Name",
+      "Bonvoy Tier Level",
+      "Points Balance"
+    ],
+    "iterationPolicy": {
+      "expectedRoundsPerCampaign": 10,
+      "owner": "Markets",
+      "note": "Markets manage revisions until final approval."
+    }
+  },
+  "phases": [
+    {
+      "id": "pre-step-0",
+      "title": "Pre-Step 0 - Platform Revamp and Admin Foundation",
+      "description": "Major implementation already completed and ready as baseline for next development.",
+      "deadline": {
+        "startDate": "2026-04-07",
+        "endDate": "2026-04-10",
+        "owner": "Mediatropy",
+        "milestone": "Friday EOD baseline"
+      },
+      "items": [
+        {
+          "id": "ps0-1",
+          "title": "Architecture migration completed (React + Express + Prisma)",
+          "details": "Legacy structure moved to React frontend and Express API with Prisma data layer.",
+          "status": "done"
+        },
+        {
+          "id": "ps0-2",
+          "title": "Admin shell and Marriott branding applied",
+          "details": "TailAdmin-based shell integrated with Marriott brand assets, color theme, and responsive layout.",
+          "status": "done"
+        },
+        {
+          "id": "ps0-3",
+          "title": "Auth, session, and role permission foundation completed",
+          "details": "Login flow, protected routes, role matrix, and permission guards are in place.",
+          "status": "done"
+        },
+        {
+          "id": "ps0-4",
+          "title": "Users management implemented with modal workflows",
+          "details": "Create, edit, change role, reset password, and active status management implemented.",
+          "status": "done"
+        },
+        {
+          "id": "ps0-5",
+          "title": "Archive migrated with full core behavior parity",
+          "details": "Search-first filtering, year/area/market filtering, sync/reset controls, and month chips are active.",
+          "status": "done"
+        },
+        {
+          "id": "ps0-6",
+          "title": "Preview flow moved into React route",
+          "details": "Archive opens preview in-app with back/open/copy/device controls.",
+          "status": "done"
+        },
+        {
+          "id": "ps0-7",
+          "title": "Broken preview handling hardened",
+          "details": "Broken mirror/error pages now detected and shown as NO PREVIEW fallback.",
+          "status": "done"
+        },
+        {
+          "id": "ps0-8",
+          "title": "Admin master modules scaffolded with database-backed CRUD",
+          "details": "Template, Source Campaign Master, Areas, and Markets modules now available for configuration.",
+          "status": "done"
+        },
+        {
+          "id": "ps0-9",
+          "title": "Builder template grouping aligned to Template 1-6",
+          "details": "Fixed template group structure added for Template 1-6 with campaign-level template selection.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": "pre-step-1",
+      "title": "Pre-Step 1 - Template Preparation",
+      "description": "Template preparation wave focused on archive parity and master-data quality.",
+      "deadline": {
+        "startDate": "2026-04-08",
+        "endDate": "2026-04-10",
+        "owner": "Mediatropy + Markets",
+        "milestone": "Next sprint"
+      },
+      "items": [
+        {
+          "id": "ps1-1",
+          "title": "Archive-to-master seeding pipeline implemented",
+          "details": "Seed endpoint added to populate/update Areas, Markets, Additional Markets, and Source Campaign Master from deployed archive rows.",
+          "status": "done"
+        },
+        {
+          "id": "ps1-2",
+          "title": "Execute seed run and validate master data quality",
+          "details": "Run seed on environment and verify template/area/market/additional-market mapping quality before Step 1 handoff.",
+          "status": "done"
+        },
+        {
+          "id": "ps1-3",
+          "title": "Markets admin split completed",
+          "details": "Markets module now separated into two tables: Markets and Additional Markets, each with dedicated create/edit workflow.",
+          "status": "done"
+        },
+        {
+          "id": "ps1-4",
+          "title": "Source Campaign Master moved to dedicated admin module",
+          "details": "Source Campaign management is now separated from Template page and handled in Admin - Source Campaigns.",
+          "status": "done"
+        },
+        {
+          "id": "ps1-5",
+          "title": "Additional Markets selection upgraded to multi-select",
+          "details": "Source Campaign forms now use multi-select for Additional Markets instead of free-text comma input.",
+          "status": "done"
+        },
+        {
+          "id": "ps1-6",
+          "title": "Template preview modal enabled (view-only)",
+          "details": "Template page now supports thumbnail preview with popup viewer and stored-HTML preview mode in admin panel.",
+          "status": "done"
+        },
+        {
+          "id": "ps1-9",
+          "title": "Archive preview reliability hardening",
+          "details": "Broken-link/error-page detection is enforced so invalid preview URLs always fall back to NO PREVIEW.",
+          "status": "done"
+        },
+        {
+          "id": "ps1-10",
+          "title": "Archive UX parity polish (filters + in-panel preview flow)",
+          "details": "Archive filter/preview UX parity completed, including Preview/No Preview filter and sync loading indicator in-panel.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": "workflow-steps",
+      "title": "Main Workflow Steps (Markets + System + Mediatropy)",
+      "description": "Execution flow for campaign build and proof approval lifecycle (Step 0 to Step 6), with build/output/done criteria per step.",
+      "deadline": {
+        "startDate": "2026-04-08",
+        "endDate": "2026-05-25",
+        "owner": "Markets + Mediatropy",
+        "milestone": "Go-live workflow completion"
+      },
+      "items": [
+        {
+          "id": "wf-0",
+          "title": "Step 0 - Select source campaign/template from archive",
+          "details": "Use Archive + Source Campaign Master as the preparation baseline before Markets start Step 1.",
+          "status": "done",
+          "subItems": [
+            {
+              "id": "wf-0-1",
+              "title": "Source Campaign Master module available in Admin",
+              "status": "done"
+            },
+            {
+              "id": "wf-0-2",
+              "title": "Archive-to-master seeding endpoint implemented",
+              "status": "done"
+            },
+            {
+              "id": "wf-0-3",
+              "title": "Seed execution and source campaign quality validation on active environment",
+              "status": "done"
+            },
+            {
+              "id": "wf-0-4",
+              "title": "Market-facing source selection readiness sign-off",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "id": "wf-1",
+          "title": "Step 1 - Markets select template and create campaign draft (Marriott)",
+          "details": "Build: campaign workspace + template picker from approved set (Template 1-6) + pre-confirm preview. Output: campaign draft created from selected template. Done when: market can create a valid campaign draft without manual DB edits.",
+          "status": "done",
+          "subItems": [
+            {
+              "id": "wf-1-1",
+              "title": "Template picker wired to approved templates (Template 1-6)",
+              "status": "done"
+            },
+            {
+              "id": "wf-1-2",
+              "title": "Campaign selector/manager wired from Campaign module",
+              "status": "done"
+            },
+            {
+              "id": "wf-1-3",
+              "title": "Pre-confirm preview flow before draft creation",
+              "status": "done"
+            },
+            {
+              "id": "wf-1-4",
+              "title": "Create campaign draft action (no manual DB edits)",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "id": "wf-2",
+          "title": "Step 2 - Markets build content and images in drag-drop template builder",
+          "details": "Build: structured JSON-based drag-drop editor with locked header/footer, personalization, email-safe rendering, versioning, and QA checks. Output: versioned draft HTML is generated safely and previewable on desktop/mobile before proof send. Done when: market can build/edit/reorder blocks and save validated drafts without manual HTML edits.",
+          "status": "in_progress",
+          "subItems": [
+            {
+              "id": "wf-2-1",
+              "title": "Define strict template JSON model (blocks/layout/props/tokens) and persist in DB",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-2",
+              "title": "Lock header/footer blocks (cannot move/delete)",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-3",
+              "title": "Implement dnd-kit drag-drop canvas foundation",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-4",
+              "title": "Build left panel block library",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-5",
+              "title": "Build center canvas drop zones + block reorder/snap",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-6",
+              "title": "Build right panel block settings (text/image/link/style)",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-7",
+              "title": "Add undo/redo history stack",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-8",
+              "title": "Add autosave draft snapshots",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-9",
+              "title": "Implement JSON -> email-safe HTML renderer",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-10",
+              "title": "Enforce Outlook-safe table structure rules",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-11",
+              "title": "Sanitize pasted/imported HTML before render",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-12",
+              "title": "Desktop/Mobile preview modes before proof send",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-13",
+              "title": "Asset workflow: upload/replace/crop + alt text",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-14",
+              "title": "Token picker for Member Name / Bonvoy Tier / Points Balance",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-15",
+              "title": "Token validation to block broken personalization",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-16",
+              "title": "Draft versioning: compare/restore",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-17",
+              "title": "Allow proof send from selected version and preserve final-lock readiness",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-18",
+              "title": "QA guardrails: missing links/images/alt + block-level validation",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-19",
+              "title": "Campaign-scoped workflow foundation (Campaign list + Manage entry + builder context by campaignId)",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-20",
+              "title": "Campaign workspace tabs scaffolded (Builder, Proof, Approval, Versions, History)",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-21",
+              "title": "Campaign template binding hardened (manage flow now respects selected campaign template)",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-22",
+              "title": "Step 2 workspace UX cleanup (metadata strip + optional quick populate panel)",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-23",
+              "title": "Step 2 market UAT sign-off and final polish pass",
+              "status": "in_progress"
+            },
+            {
+              "id": "wf-2-24",
+              "title": "Builder UX Phase A polish (sticky actions, cleaner flow, advanced tools collapsed)",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-25",
+              "title": "Builder UX Phase B polish (section controls, labeled block settings, visible preview device tabs)",
+              "status": "done"
+            },
+            {
+              "id": "wf-2-26",
+              "title": "Media module (WordPress-like) for Step 2 assets using server storage first",
+              "status": "in_progress",
+              "subItems": [
+                {
+                  "id": "wf-2-26-1",
+                  "title": "Add Media menu/page with gallery grid, search/filter, and detail drawer",
+                  "status": "done"
+                },
+                {
+                  "id": "wf-2-26-2",
+                  "title": "Implement media APIs and DB persistence (server storage, cloud-ready abstraction later)",
+                  "status": "done"
+                },
+                {
+                  "id": "wf-2-26-3",
+                  "title": "Enable multi-upload, metadata edit (name/alt), single delete and bulk delete",
+                  "status": "todo"
+                }
+              ]
+            },
+            {
+              "id": "wf-2-27",
+              "title": "Builder image field integration with Media library picker",
+              "status": "todo",
+              "subItems": [
+                {
+                  "id": "wf-2-27-1",
+                  "title": "Add 'Choose from Media' and 'Upload new' actions in Step 2 image forms",
+                  "status": "todo"
+                },
+                {
+                  "id": "wf-2-27-2",
+                  "title": "Reuse one media modal across click-to-edit and block settings image workflows",
+                  "status": "todo"
+                },
+                {
+                  "id": "wf-2-27-3",
+                  "title": "Keep direct URL input as fallback for external asset links",
+                  "status": "todo"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "wf-3",
+          "title": "Step 3 - Markets send proofs to inbox (up to 10 iterations)",
+          "details": "Build: send-proof action, recipients, revision note, resend flow, and iteration counter/history (up to 10). Output: proof rounds tracked with timestamps. Done when: full revision loop runs without losing version history.",
+          "status": "todo",
+          "subItems": [
+            {
+              "id": "wf-3-1",
+              "title": "Proof recipient list and validation",
+              "status": "todo"
+            },
+            {
+              "id": "wf-3-2",
+              "title": "Send proof action with iteration increment",
+              "status": "todo"
+            },
+            {
+              "id": "wf-3-3",
+              "title": "Revision note and resend flow",
+              "status": "todo"
+            },
+            {
+              "id": "wf-3-4",
+              "title": "Iteration cap guard (max 10 rounds)",
+              "status": "todo"
+            },
+            {
+              "id": "wf-3-5",
+              "title": "Proof history log with timestamps and status",
+              "status": "todo"
+            }
+          ]
+        },
+        {
+          "id": "wf-4",
+          "title": "Step 4 - Markets mark proof as final",
+          "details": "Build: Mark as Final action with lock behavior and final snapshot. Output: status moves to final-approved with full timeline. Done when: final version is immutable and auditable.",
+          "status": "todo",
+          "subItems": [
+            {
+              "id": "wf-4-1",
+              "title": "Mark-as-final action in workflow",
+              "status": "todo"
+            },
+            {
+              "id": "wf-4-2",
+              "title": "Final snapshot stored for approved proof",
+              "status": "todo"
+            },
+            {
+              "id": "wf-4-3",
+              "title": "Lock editing after final approval",
+              "status": "todo"
+            },
+            {
+              "id": "wf-4-4",
+              "title": "Audit timeline updated with finalization event",
+              "status": "todo"
+            }
+          ]
+        },
+        {
+          "id": "wf-5",
+          "title": "Step 5 - System sends final approval notification to Mediatropy",
+          "details": "Build: automatic notification trigger after Step 4, email template, retry and delivery logs. Output: Mediatropy receives final-ready notification with campaign context. Done when: send is reliable and logged.",
+          "status": "todo",
+          "subItems": [
+            {
+              "id": "wf-5-1",
+              "title": "Final-approval trigger fired from Step 4 event",
+              "status": "todo"
+            },
+            {
+              "id": "wf-5-2",
+              "title": "Notification email template and payload mapping",
+              "status": "todo"
+            },
+            {
+              "id": "wf-5-3",
+              "title": "Delivery retry mechanism",
+              "status": "todo"
+            },
+            {
+              "id": "wf-5-4",
+              "title": "Notification delivery log and status visibility",
+              "status": "todo"
+            }
+          ]
+        },
+        {
+          "id": "wf-6",
+          "title": "Step 6 - Mediatropy inputs final assets into Adobe Web UI",
+          "details": "Build: final handoff checklist and status update flow for Adobe Web UI entry. Output: campaign marked handoff completed. Done when: MT confirms Adobe input completion and campaign is closed.",
+          "status": "todo",
+          "subItems": [
+            {
+              "id": "wf-6-1",
+              "title": "Final handoff checklist prepared from approved proof",
+              "status": "todo"
+            },
+            {
+              "id": "wf-6-2",
+              "title": "Adobe Web UI submission metadata captured",
+              "status": "todo"
+            },
+            {
+              "id": "wf-6-3",
+              "title": "Handoff completion confirmation by Mediatropy",
+              "status": "todo"
+            },
+            {
+              "id": "wf-6-4",
+              "title": "Campaign closed with final status and timestamp",
+              "status": "todo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "name": "edm-history-tool-2026",
+  "version": "1.0.0",
+  "description": "A web-based archive tool for browsing and previewing deployed Marriott Bonvoy email campaigns (eDMs). Data is fetched live from Smartsheet and cached locally for fast access.",
+  "main": "app.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "node api/server.js",
+    "dev:web": "npm --prefix frontend run dev",
+    "dev:legacy": "npx --yes netlify-cli@24.10.0 dev --functions-port 34567",
+    "build": "npm run build:web",
+    "build:web": "npm --prefix frontend run build",
+    "start": "node api/server.js",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "postinstall": "prisma generate && npm --prefix frontend install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-mediatropy:gillian-chow-mediatropy/eDM-History-Tool-2026.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20 <25"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "multer": "^2.1.1",
+    "prisma": "^6.16.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

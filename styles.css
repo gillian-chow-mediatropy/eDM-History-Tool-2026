@@ -200,6 +200,16 @@ nav.scrolled {
     background: rgba(255,255,255,0.1);
 }
 
+.nav-action-link {
+    text-decoration: none;
+    font-family: var(--font-heading);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 10px;
+}
+
 /* ---- Hero / Landing ---- */
 header {
     position: relative;

@@ -1,0 +1,338 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TemplateStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum ProofSendStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  VIEWER
+  APPROVER
+}
+
+enum MarketType {
+  MARKET
+  ADDITIONAL_MARKET
+}
+
+enum CampaignStatus {
+  DRAFT
+  IN_PROGRESS
+  FINAL
+  ARCHIVED
+}
+
+model EmailTemplate {
+  id          String                @id @default(cuid())
+  name        String
+  slug        String                @unique
+  subject     String
+  preheader   String?
+  html        String                @db.Text
+  status      TemplateStatus        @default(DRAFT)
+  createdBy   String?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  versions    EmailTemplateVersion[]
+  proofSends  ProofSend[]
+
+  @@index([status])
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  fullName     String
+  passwordHash String
+  role         UserRole      @default(EDITOR)
+  isActive     Boolean       @default(true)
+  markets      Json?
+  lastLoginAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  sessions     UserSession[]
+  resetTokens  PasswordResetToken[]
+
+  @@index([role, isActive])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model TemplateMaster {
+  id              String                 @id @default(cuid())
+  code            Int                    @unique
+  name            String
+  isMain          Boolean                @default(false)
+  isActive        Boolean                @default(true)
+  sortOrder       Int                    @default(0)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  sourceCampaigns SourceCampaignMaster[]
+  builderDrafts   BuilderCampaignDraft[]
+  campaigns       Campaign[]
+
+  @@index([isActive, sortOrder])
+}
+
+model AreaMaster {
+  id              String                 @id @default(cuid())
+  code            String                 @unique
+  name            String
+  isActive        Boolean                @default(true)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  markets         MarketMaster[]
+  sourceCampaigns SourceCampaignMaster[]
+  campaigns       Campaign[]
+
+  @@index([isActive, name])
+}
+
+model MarketMaster {
+  id              String                 @id @default(cuid())
+  code            String                 @unique
+  name            String
+  type            MarketType             @default(MARKET)
+  areaId          String?
+  isActive        Boolean                @default(true)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  area            AreaMaster?            @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  sourceCampaigns SourceCampaignMaster[]
+  campaigns       Campaign[]
+
+  @@index([isActive, name])
+  @@index([type])
+  @@index([areaId])
+}
+
+model SourceCampaignMaster {
+  id                String         @id @default(cuid())
+  name              String
+  requestId         String?
+  previewLink       String?
+  templateMasterId  String?
+  areaMasterId      String?
+  marketMasterId    String?
+  additionalMarkets Json?
+  isActive          Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  templateMaster    TemplateMaster? @relation(fields: [templateMasterId], references: [id], onDelete: SetNull)
+  areaMaster        AreaMaster?    @relation(fields: [areaMasterId], references: [id], onDelete: SetNull)
+  marketMaster      MarketMaster?  @relation(fields: [marketMasterId], references: [id], onDelete: SetNull)
+  builderDrafts     BuilderCampaignDraft[]
+  campaigns         Campaign[]
+
+  @@index([isActive, name])
+  @@index([templateMasterId])
+  @@index([areaMasterId])
+  @@index([marketMasterId])
+}
+
+model BuilderCampaignDraft {
+  id                     String                       @id @default(cuid())
+  campaignName           String
+  subject                String?
+  preheader              String?
+  templateMasterId       String
+  sourceCampaignMasterId String?
+  campaignId             String?
+  schemaVersion          Int                          @default(1)
+  layoutJson             Json
+  htmlDraft              String?                      @db.Text
+  latestVersionNumber    Int                          @default(1)
+  isActive               Boolean                      @default(true)
+  createdById            String?
+  createdAt              DateTime                     @default(now())
+  updatedAt              DateTime                     @updatedAt
+  templateMaster         TemplateMaster               @relation(fields: [templateMasterId], references: [id], onDelete: Restrict)
+  sourceCampaignMaster   SourceCampaignMaster?        @relation(fields: [sourceCampaignMasterId], references: [id], onDelete: SetNull)
+  campaign               Campaign?                    @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  versions               BuilderCampaignDraftVersion[]
+
+  @@index([templateMasterId, isActive])
+  @@index([sourceCampaignMasterId])
+  @@index([campaignId])
+  @@index([campaignName])
+}
+
+model Campaign {
+  id                   String                  @id @default(cuid())
+  code                 String                  @unique
+  name                 String
+  status               CampaignStatus          @default(DRAFT)
+  templateMasterId     String?
+  sourceCampaignId     String?
+  areaMasterId         String?
+  marketMasterId       String?
+  additionalMarkets    Json?
+  currentVersionNumber Int                     @default(0)
+  currentProofRound    Int                     @default(0)
+  isActive             Boolean                 @default(true)
+  createdById          String?
+  updatedById          String?
+  deletedAt            DateTime?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  templateMaster       TemplateMaster?         @relation(fields: [templateMasterId], references: [id], onDelete: SetNull)
+  sourceCampaign       SourceCampaignMaster?   @relation(fields: [sourceCampaignId], references: [id], onDelete: SetNull)
+  areaMaster           AreaMaster?             @relation(fields: [areaMasterId], references: [id], onDelete: SetNull)
+  marketMaster         MarketMaster?           @relation(fields: [marketMasterId], references: [id], onDelete: SetNull)
+  builderDrafts        BuilderCampaignDraft[]
+  versions             CampaignVersion[]
+  proofSends           CampaignProofSend[]
+  activities           CampaignActivity[]
+
+  @@index([status, isActive])
+  @@index([templateMasterId])
+  @@index([sourceCampaignId])
+  @@index([areaMasterId])
+  @@index([marketMasterId])
+  @@index([createdAt])
+}
+
+model CampaignVersion {
+  id             String    @id @default(cuid())
+  campaignId     String
+  versionNumber  Int
+  subject        String?
+  preheader      String?
+  layoutJson     Json?
+  htmlContent    String?   @db.Text
+  changeNote     String?
+  createdById    String?
+  createdAt      DateTime  @default(now())
+  campaign       Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  proofSends     CampaignProofSend[]
+
+  @@unique([campaignId, versionNumber])
+  @@index([campaignId, createdAt])
+}
+
+model CampaignProofSend {
+  id                String          @id @default(cuid())
+  campaignId        String
+  campaignVersionId String?
+  iterationNo       Int
+  recipients        Json
+  subject           String?
+  status            ProofSendStatus @default(QUEUED)
+  providerMessageId String?
+  errorMessage      String?
+  sentAt            DateTime?
+  createdById       String?
+  createdAt         DateTime        @default(now())
+  campaign          Campaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignVersion   CampaignVersion? @relation(fields: [campaignVersionId], references: [id], onDelete: SetNull)
+
+  @@index([campaignId, createdAt])
+  @@index([campaignVersionId])
+  @@index([status, createdAt])
+}
+
+model CampaignActivity {
+  id          String   @id @default(cuid())
+  campaignId  String
+  type        String
+  message     String
+  metadata    Json?
+  createdById String?
+  createdAt   DateTime @default(now())
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, createdAt])
+  @@index([type])
+}
+
+model BuilderCampaignDraftVersion {
+  id                String               @id @default(cuid())
+  draftId           String
+  versionNumber     Int
+  layoutJson        Json
+  htmlDraft         String?              @db.Text
+  createdById       String?
+  createdAt         DateTime             @default(now())
+  draft             BuilderCampaignDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
+
+  @@unique([draftId, versionNumber])
+  @@index([draftId, createdAt])
+}
+
+model UserSession {
+  id          String   @id @default(cuid())
+  userId      String
+  tokenHash   String   @unique
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model EmailTemplateVersion {
+  id             String        @id @default(cuid())
+  templateId     String
+  versionNumber  Int
+  subject        String
+  preheader      String?
+  html           String        @db.Text
+  changeNote     String?
+  createdAt      DateTime      @default(now())
+  template       EmailTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  proofSends     ProofSend[]
+
+  @@unique([templateId, versionNumber])
+  @@index([templateId, createdAt])
+}
+
+model ProofSend {
+  id                String               @id @default(cuid())
+  templateId        String
+  templateVersionId String?
+  provider          String
+  fromEmail         String
+  recipients        Json
+  subject           String
+  status            ProofSendStatus      @default(QUEUED)
+  providerMessageId String?
+  errorMessage      String?
+  sentAt            DateTime?
+  createdAt         DateTime             @default(now())
+  template          EmailTemplate        @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  templateVersion   EmailTemplateVersion? @relation(fields: [templateVersionId], references: [id], onDelete: SetNull)
+
+  @@index([templateId, createdAt])
+  @@index([status, createdAt])
+}

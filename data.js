@@ -35,6 +35,7 @@ const CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours max before forced refresh
 
 let EMAIL_DATA = {};
 let DATA_LOADED = false;
+let DATA_LOAD_ERROR = null;
 
 function parseRow(row) {
     const obj = {};
@@ -61,7 +62,16 @@ function deriveDateInfo(record) {
 
 async function fetchPage(page, pageSize) {
     const resp = await fetch(`/.netlify/functions/smartsheet?pageSize=${pageSize}&page=${page}`);
-    if (!resp.ok) throw new Error("API error: " + resp.status);
+    if (!resp.ok) {
+        let serverMessage = "";
+        try {
+            const payload = await resp.json();
+            if (payload && payload.error) serverMessage = " - " + payload.error;
+        } catch (e) {
+            // Ignore JSON parsing errors and keep generic status message
+        }
+        throw new Error("API error: " + resp.status + serverMessage);
+    }
     return resp.json();
 }
 
@@ -152,6 +162,7 @@ async function fetchAllFromSmartsheet() {
 
 async function loadSmartsheetData() {
     try {
+        DATA_LOAD_ERROR = null;
         const cache = loadFromCache();
         const cacheAge = cache ? Date.now() - cache.timestamp : Infinity;
         const cacheExpired = cacheAge > CACHE_MAX_AGE;
@@ -182,6 +193,7 @@ async function loadSmartsheetData() {
         console.log("Smartsheet data loaded:", Object.keys(EMAIL_DATA).map(y => `${y}: ${EMAIL_DATA[y].length} emails`).join(", "));
 
     } catch (err) {
+        DATA_LOAD_ERROR = err && err.message ? err.message : "Unknown error";
         console.error("Failed to load Smartsheet data:", err);
 
         // If fetch fails but we have a stale cache, use it
@@ -191,7 +203,10 @@ async function loadSmartsheetData() {
             DATA_LOADED = true;
             console.log("Using stale cache as fallback");
         } else {
-            DATA_LOADED = false;
+            // Keep app usable even when API credentials are missing.
+            EMAIL_DATA = {};
+            DATA_LOADED = true;
+            console.warn("No cache available. App loaded with empty data set.");
         }
     }
 }

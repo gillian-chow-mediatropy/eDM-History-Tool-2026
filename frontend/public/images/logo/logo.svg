@@ -1,0 +1,6 @@
+<svg width="192" height="36" viewBox="0 0 192 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="36" height="36" rx="10" fill="#FF8D6B"/>
+  <path d="M8.5 26V10L14.5 17L18 12L21.5 17L27.5 10V26" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="46" y="14" fill="#101828" font-family="Outfit, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.2">MARRIOTT</text>
+  <text x="46" y="29" fill="#475467" font-family="Outfit, Arial, sans-serif" font-size="14" font-weight="600">Email Tools</text>
+</svg>

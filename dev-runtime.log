@@ -1,0 +1,75 @@
+
+> edm-history-tool-2026@1.0.0 dev
+> concurrently "npm run dev:api" "npm run dev:web"
+
+[0] 
+[0] > edm-history-tool-2026@1.0.0 dev:api
+[0] > node api/server.js
+[0] 
+[1] 
+[1] > edm-history-tool-2026@1.0.0 dev:web
+[1] > npm --prefix frontend run dev
+[1] 
+[0] API running on http://localhost:3001
+[1] 
+[1] > edm-marriott-web@1.0.0 dev
+[1] > vite
+[1] 
+[1] 
+[1]   [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m374[22m[2m[0m ms[22m
+[1] 
+[1]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[1] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[1] [2m07.38.25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ArchivePage.jsx, /src/styles.css[22m
+[1] [2m07.38.48[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[1] Error: Cannot apply unknown utility class `border-brand-200`
+[1]     at onInvalidCandidate (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:21:1511)
+[1]     at $e (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:16:37066)
+[1]     at file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:21:355
+[1]     at Cr (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:3:1733)
+[1]     at _ (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:3:1377)
+[1]     at Ce (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:21:172)
+[1]     at Zi (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:38:294)
+[1]     at async ua (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:38:631)
+[1]     at async su (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/@tailwindcss/node/dist/index.mjs:10:3389)
+[1]     at async $ (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/@tailwindcss/postcss/dist/index.mjs:10:3853)
+[1]     at async Object.Once (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/@tailwindcss/postcss/dist/index.mjs:10:4639)
+[1]     at async LazyResult.runAsync (C:\Users\Noor Alizah Afifah\Documents\Mediatropy\eDM-History-Tool-2026\frontend\node_modules\postcss\lib\lazy-result.js:293:11)
+[1]     at async compileCSS (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:36898:21)
+[1]     at async TransformPluginContext.transform (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:36171:11)
+[1]     at async PluginContainer.transform (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+[1]     at async loadAndTransform (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+[1]     at async viteTransformMiddleware (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+[1] [2m07.38.48[22m [31m[1m[vite][22m[39m [31mInternal server error: [postcss] tailwindcss: C:/Users/Noor Alizah Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/src/styles.css:1:1: Cannot apply unknown utility class `border-brand-200`[39m
+[1]   Plugin: [35mvite:css[39m
+[1]   File: [36mC:/Users/Noor Alizah Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/src/styles.css[39m:1:0
+[1] [33m  1  |  @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+[1]      |  ^
+[1]   2  |  @import "tailwindcss";
+[1]   3  |  [39m
+[1]       at Input.error (C:\Users\Noor Alizah Afifah\Documents\Mediatropy\eDM-History-Tool-2026\frontend\node_modules\postcss\lib\input.js:135:16)
+[1]       at Root.error (C:\Users\Noor Alizah Afifah\Documents\Mediatropy\eDM-History-Tool-2026\frontend\node_modules\postcss\lib\node.js:146:32)
+[1]       at Object.Once (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/@tailwindcss/postcss/dist/index.mjs:10:6631)
+[1]       at async LazyResult.runAsync (C:\Users\Noor Alizah Afifah\Documents\Mediatropy\eDM-History-Tool-2026\frontend\node_modules\postcss\lib\lazy-result.js:293:11)
+[1]       at async compileCSS (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:36898:21)
+[1]       at async TransformPluginContext.transform (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:36171:11)
+[1]       at async PluginContainer.transform (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+[1]       at async loadAndTransform (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+[1]       at async viteTransformMiddleware (file:///C:/Users/Noor%20Alizah%20Afifah/Documents/Mediatropy/eDM-History-Tool-2026/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+[1] [2m07.39.40[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[1] [2m08.08.55[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[1] [2m08.17.08[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ProgressPage.jsx, /src/styles.css[22m
+[1] [2m08.19.29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ProgressPage.jsx, /src/styles.css[22m
+[1] [2m08.23.32[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[1] [2m08.36.31[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ProgressPage.jsx, /src/styles.css[22m
+[1] [2m08.36.57[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[1] [2m08.51.12[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m
+[1] [2m08.51.43[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m
+[1] [2m08.52.10[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m
+[1] [2m08.52.34[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m
+[1] [2m08.53.01[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m
+[1] [2m08.53.34[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m
+[1] [2m08.54.03[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m
+[1] [2m08.54.26[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m
+[1] [2m08.55.00[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m
+[1] [2m08.55.47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BuilderPage.jsx, /src/styles.css[22m

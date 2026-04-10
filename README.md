@@ -1,112 +1,125 @@
-# Marriott DMM Archive
+# eDM Marriott Email Tools (2026)
 
-A web-based archive tool for browsing and previewing deployed Marriott Bonvoy email campaigns (eDMs). Data is fetched live from Smartsheet and cached locally for fast access.
-
-## Features
-
-- **Smartsheet Integration** — Automatically pulls deployed email campaign data via Smartsheet API
-- **Local Caching** — Caches data in `localStorage` with 24-hour expiry and background update checks
-- **Email Preview** — View emails in mobile (375px), tablet (768px), and desktop (1200px) viewports
-- **Copy HTML** — Copy the full HTML source of any email to clipboard
-- **Filtering** — Filter by year, month, area, and target market
-- **Search** — Full-text search across campaign name, description, type, template, market, and more
-- **Broken Link Detection** — Automatically checks and flags broken preview URLs
-- **Password Protected** — Simple password gate with session persistence
-- **Responsive Design** — Dark-themed UI optimized for desktop and tablet use
+Web platform for Marriott campaign workflow: archive browsing, template/source admin, campaign workspace (builder/proof/versions), and role-based operations.
 
 ## Tech Stack
 
-- **Frontend:** Vanilla HTML, CSS, JavaScript (no frameworks)
-- **Backend:** Netlify Functions (serverless Node.js)
-- **Data Source:** Smartsheet API v2.0
-- **Hosting:** Netlify
+- Frontend: React + Vite (`frontend/`)
+- Backend: Express API (`api/`)
+- Database: PostgreSQL + Prisma (`prisma/`)
+- Auth: session cookie + role/permission guards
+- Email proof provider: Resend (via `send-proof` route)
 
-## Project Structure
+## Project Status
 
+- Baseline migration to React + Express + Prisma is complete.
+- Admin master data modules are live (Templates, Source Campaigns, Areas, Markets).
+- Campaign workspace and Step 1/Step 2 builder flow are implemented.
+- Template listing now supports `Template + Language` rows with working-link prioritization.
+- Remaining major work is workflow completion for Step 3 to Step 6.
+
+Detailed tracking is in `project.md` and `api/data/progress.json`.
+
+## Prerequisites
+
+- Node.js 20 or 22 (`.nvmrc` is `22`)
+- Docker Desktop
+
+## Local Setup
+
+1. Use Node version from `.nvmrc`
+```bash
+nvm use
 ```
-├── index.html                    # Main page (landing + year view)
-├── preview.html                  # Email preview page with device toggle
-├── app.js                        # UI logic (filters, rendering, navigation)
-├── data.js                       # Smartsheet data fetching + caching
-├── styles.css                    # All styles
-├── netlify.toml                  # Netlify build config
-├── .gitignore
-└── netlify/
-    └── functions/
-        ├── smartsheet.js         # Smartsheet API proxy (pagination)
-        ├── check-url.js          # URL health checker (HEAD request)
-        └── fetch-html.js         # Fetches email HTML for preview/copy
+2. Install dependencies
+```bash
+npm install
+```
+3. Create local environment file
+```bash
+cp .env.example .env
+```
+4. Start PostgreSQL container
+```bash
+npm run db:up
+```
+5. Initialize database schema
+```bash
+npx prisma db push
+```
+6. Start app (API + frontend)
+```bash
+npm run dev
 ```
 
-## Setup
+## URLs
 
-### Prerequisites
+- Frontend: `http://localhost:5173`
+- API: `http://localhost:3001`
+- PostgreSQL: `localhost:5433`
 
-- [Node.js](https://nodejs.org/) (for local development)
-- [Netlify CLI](https://docs.netlify.com/cli/get-started/) (`npm install -g netlify-cli`)
-- A Smartsheet API token with read access to the email tracker sheet
+Project database uses `5433` intentionally to avoid local `5432` conflicts.
 
-### Local Development
+## Useful Commands
 
-1. Clone the repository:
-   ```bash
-   git clone <repo-url>
-   cd eDM-History-Tool-2026
-   ```
+- Start full app: `npm run dev`
+- Start API only: `npm run dev:api`
+- Start frontend only: `npm run dev:web`
+- Build frontend: `npm run build:web`
+- Start production API: `npm start`
+- Start DB container: `npm run db:up`
+- Stop DB container: `npm run db:down`
+- Prisma generate: `npm run prisma:generate`
+- Prisma migrate (dev): `npm run prisma:migrate`
+- Prisma deploy migrations: `npm run prisma:deploy`
+- Prisma Studio: `npm run prisma:studio`
+- Legacy stack (reference only): `npm run dev:legacy`
 
-2. Start the Netlify dev server:
-   ```bash
-   netlify dev
-   ```
+## Environment Variables
 
-3. Open `http://localhost:8888` in your browser.
+See `.env.example` for defaults and full keys.
 
-4. Enter the password to access the archive.
+Core variables:
+- `DATABASE_URL`
+- `SMARTSHEET_API_TOKEN`
+- `SMARTSHEET_SHEET_ID`
+- `PROOF_EMAIL_PROVIDER`
+- `RESEND_API_KEY`
+- `PROOF_FROM_EMAIL`
+- `PASSWORD_RESET_FROM_EMAIL`
+- `PASSWORD_RESET_TOKEN_MINUTES`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `ADMIN_NAME`
+- `FRONTEND_URL`
+- `API_PORT`
 
-### Deployment
+## Auth and Permissions
 
-Push to the connected Git branch — Netlify auto-deploys on push.
+Roles:
+- `ADMIN`
+- `EDITOR`
+- `VIEWER`
+- `APPROVER`
 
-Make sure the Smartsheet API token is set as an environment variable in **Netlify > Site settings > Environment variables** if it's not hardcoded in the function.
+Permission keys used in app:
+- `builder:view`
+- `builder:edit`
+- `proof:send`
+- `settings:view`
+- `settings:manage_users`
 
-## How It Works
- 
-### Data Flow
+## Main Modules
 
-1. On page load, `data.js` checks `localStorage` for cached data
-2. If cache is valid (< 24 hours), it loads instantly and checks for updates in the background
-3. If cache is expired or missing, it fetches all data from Smartsheet via the `smartsheet` Netlify Function
-4. Only rows with status **"Deployed"** and year **>= 2026** are included
-5. Preview URLs are validated via the `check-url` function — broken links are flagged
+- `Archive`: search/filter deployed campaigns with preview handling.
+- `Campaigns`: create/manage campaign workspaces.
+- `Builder`: template-bound draft editor, QA checks, versions, proof send.
+- `Templates`: fixed Template 1-6 management and archive HTML import.
+- `Source Campaigns`: source catalog and preview link management.
+- `Areas` and `Markets`: master data for campaign mapping.
+- `Users`: admin user and role management.
 
-### Smartsheet Field Mapping
+## Notes
 
-| Smartsheet Column ID | Field               |
-|----------------------|---------------------|
-| 1156879576524676     | requestId           |
-| 6252542022707076     | status              |
-| 2300228855457668     | earliestDeploymentDate |
-| 6803828482828164     | latestDeploymentDate |
-| 7623657374568324     | campaignName        |
-| 3187176543309700     | campaignDescription |
-| 3371405229746052     | campaignType        |
-| 3496432308014980     | area                |
-| 5596505414258564     | targetMarket        |
-| 5195369913995140     | previewLink         |
-
-### Manual Sync
-
-Click the **sync button** (circular arrow icon) in the navigation bar to force a full data refresh from Smartsheet. A full-screen overlay blocks interaction during the sync.
-
-## Area Codes
-
-| Code | Area                        |
-|------|-----------------------------|
-| ANZP | Australia, NZ & Pacific     |
-| APEC | Asia Pacific (excl. China)  |
-| GC   | Greater China               |
-| IM   | International Markets       |
-| JPG  | Japan & Guam                |
-| SA   | South Asia                  |
-| SKPV | South Korea, Philippines & Vietnam |
-| SM   | Select Markets              |
+- Frontend build may show chunk-size warning from Vite; currently non-blocking.
+- Legacy Netlify/vanilla implementation is still present for reference.
