@@ -13,7 +13,20 @@ const ALLOWED_MIME = new Map([
     ["image/png", ".png"],
     ["image/gif", ".gif"],
     ["image/webp", ".webp"],
-    ["image/svg+xml", ".svg"]
+    ["image/svg+xml", ".svg"],
+    ["video/mp4", ".mp4"],
+    ["video/webm", ".webm"],
+    ["video/quicktime", ".mov"],
+    ["video/x-m4v", ".m4v"],
+    ["application/pdf", ".pdf"],
+    ["text/plain", ".txt"],
+    ["text/csv", ".csv"],
+    ["application/msword", ".doc"],
+    ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx"],
+    ["application/vnd.ms-excel", ".xls"],
+    ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx"],
+    ["application/vnd.ms-powerpoint", ".ppt"],
+    ["application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx"]
 ]);
 const MIME_BY_EXT = new Map([
     [".jpg", "image/jpeg"],
@@ -21,7 +34,20 @@ const MIME_BY_EXT = new Map([
     [".png", "image/png"],
     [".gif", "image/gif"],
     [".webp", "image/webp"],
-    [".svg", "image/svg+xml"]
+    [".svg", "image/svg+xml"],
+    [".mp4", "video/mp4"],
+    [".webm", "video/webm"],
+    [".mov", "video/quicktime"],
+    [".m4v", "video/x-m4v"],
+    [".pdf", "application/pdf"],
+    [".txt", "text/plain"],
+    [".csv", "text/csv"],
+    [".doc", "application/msword"],
+    [".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+    [".xls", "application/vnd.ms-excel"],
+    [".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+    [".ppt", "application/vnd.ms-powerpoint"],
+    [".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"]
 ]);
 const UPLOADS_ROOT_DIR = path.resolve(__dirname, "..", "..", "uploads", "builder");
 const PROJECT_ROOT_DIR = path.resolve(__dirname, "..", "..");
@@ -30,7 +56,7 @@ let mediaTableReadyPromise = null;
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
-        fileSize: 8 * 1024 * 1024
+        fileSize: 40 * 1024 * 1024
     }
 });
 
@@ -93,7 +119,7 @@ function mapAssetRow(row, req) {
 async function saveUploadedFileToStorage(file, req, createdById = null) {
     const extension = ALLOWED_MIME.get(String(file?.mimetype || "").toLowerCase());
     if (!extension) {
-        const error = new Error("Unsupported image format. Use JPG, PNG, GIF, WEBP, or SVG.");
+        const error = new Error("Unsupported media format. Use images, videos, PDF, and Office docs (DOC/DOCX/XLS/XLSX/PPT/PPTX/TXT/CSV).");
         error.statusCode = 400;
         throw error;
     }
@@ -142,25 +168,37 @@ async function saveUploadedFileToStorage(file, req, createdById = null) {
 async function ensureMediaStoreTable() {
     if (mediaTableReadyPromise) return mediaTableReadyPromise;
 
-    mediaTableReadyPromise = prisma.$executeRawUnsafe(`
-        CREATE TABLE IF NOT EXISTS media_asset_store (
-            id TEXT PRIMARY KEY,
-            file_name TEXT NOT NULL,
-            relative_path TEXT NOT NULL UNIQUE,
-            storage_provider TEXT NOT NULL DEFAULT 'local',
-            mime_type TEXT,
-            size_bytes BIGINT NOT NULL DEFAULT 0,
-            title TEXT,
-            alt_text TEXT,
-            created_by_id TEXT,
-            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-            deleted_at TIMESTAMPTZ
-        );
-
-        CREATE INDEX IF NOT EXISTS media_asset_store_deleted_idx ON media_asset_store(deleted_at);
-        CREATE INDEX IF NOT EXISTS media_asset_store_updated_idx ON media_asset_store(updated_at DESC);
-    `).then(() => true);
+    mediaTableReadyPromise = (async () => {
+        await prisma.$executeRawUnsafe(`
+            CREATE TABLE IF NOT EXISTS media_asset_store (
+                id TEXT PRIMARY KEY,
+                file_name TEXT NOT NULL,
+                relative_path TEXT NOT NULL UNIQUE,
+                storage_provider TEXT NOT NULL DEFAULT 'local',
+                mime_type TEXT,
+                size_bytes BIGINT NOT NULL DEFAULT 0,
+                title TEXT,
+                alt_text TEXT,
+                created_by_id TEXT,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                deleted_at TIMESTAMPTZ
+            )
+        `);
+        await prisma.$executeRawUnsafe(`
+            CREATE INDEX IF NOT EXISTS media_asset_store_deleted_idx
+            ON media_asset_store(deleted_at)
+        `);
+        await prisma.$executeRawUnsafe(`
+            CREATE INDEX IF NOT EXISTS media_asset_store_updated_idx
+            ON media_asset_store(updated_at DESC)
+        `);
+        return true;
+    })().catch((error) => {
+        // Allow subsequent requests to retry table initialization after a failure.
+        mediaTableReadyPromise = null;
+        throw error;
+    });
 
     return mediaTableReadyPromise;
 }

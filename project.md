@@ -49,6 +49,8 @@ Recent updates completed:
 - `Extract Status` column added (`Ready` vs `Cannot extract the template`).
 - For `Cannot extract the template`, preview is hidden and `Import HTML` is disabled.
 - Campaign create/edit template dropdown updated to language-aware labels.
+- Media module delivered with DB persistence + filesystem sync, plus multi-upload and bulk delete.
+- Builder image flows now include shared media picker (`Choose from Media / Upload new`) for block settings and live click-to-edit image fields.
 
 ## 3) Current Workflow Status
 
@@ -62,13 +64,13 @@ Recent updates completed:
 | 5 | Final approval notification to Mediatropy | Todo |
 | 6 | Adobe handoff completion and closure | Todo |
 
-Reference: `api/data/progress.json` (dataVersion `35`, lastUpdated `2026-04-09`).
+Reference: `api/data/progress.json` (dataVersion `38`, lastUpdated `2026-04-10`).
 
 ## 4) In Progress and Not Done Yet
 
 In progress now:
 - Step 2 final market UAT sign-off and polish pass.
-- Step 2 media management track (server storage first): Media menu/library foundation and DB-backed media persistence APIs are implemented; multi-upload/bulk delete and Builder picker integration are next.
+- Step 2 visual and UX hardening around Builder interaction patterns.
 
 Not done yet:
 - Step 3 full proof lifecycle alignment with tracked iteration workflow.
@@ -95,7 +97,7 @@ Operational risks:
 P0 (highest):
 - Complete Step 3 to Step 4 core workflow contract and persistence model.
 - Add finalization lock guarantees and audit timeline coverage.
-- Add Step 2 Media module and wire image selection (`Choose from Media` / `Upload new`) in Builder image forms.
+- Stabilize and regression-test the new Step 2 Media + Builder image picker workflow across templates.
 
 P1:
 - Implement Step 5 notification trigger, retries, and status visibility.

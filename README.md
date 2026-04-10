@@ -16,6 +16,8 @@ Web platform for Marriott campaign workflow: archive browsing, template/source a
 - Admin master data modules are live (Templates, Source Campaigns, Areas, Markets).
 - Campaign workspace and Step 1/Step 2 builder flow are implemented.
 - Template listing now supports `Template + Language` rows with working-link prioritization.
+- Media module is live with DB-backed library, multi-upload, metadata update, single delete, and bulk delete.
+- Builder image editing now supports `Choose from Media / Upload new` in both block settings and click-to-edit.
 - Remaining major work is workflow completion for Step 3 to Step 6.
 
 Detailed tracking is in `project.md` and `api/data/progress.json`.
@@ -115,6 +117,7 @@ Permission keys used in app:
 - `Campaigns`: create/manage campaign workspaces.
 - `Builder`: template-bound draft editor, QA checks, versions, proof send.
 - `Templates`: fixed Template 1-6 management and archive HTML import.
+- `Media`: server-storage media library and asset management for Builder.
 - `Source Campaigns`: source catalog and preview link management.
 - `Areas` and `Markets`: master data for campaign mapping.
 - `Users`: admin user and role management.

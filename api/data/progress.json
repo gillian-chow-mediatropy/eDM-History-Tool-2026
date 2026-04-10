@@ -1,5 +1,5 @@
 {
-  "dataVersion": 37,
+  "dataVersion": 38,
   "title": "eDM Marriott Email Tools - Development Progress",
   "badge": "TEMPORARY",
   "description": "Internal tracker for build execution. Focused on major delivery items only.",
@@ -418,7 +418,7 @@
             {
               "id": "wf-2-26",
               "title": "Media module (WordPress-like) for Step 2 assets using server storage first",
-              "status": "in_progress",
+              "status": "done",
               "subItems": [
                 {
                   "id": "wf-2-26-1",
@@ -433,29 +433,29 @@
                 {
                   "id": "wf-2-26-3",
                   "title": "Enable multi-upload, metadata edit (name/alt), single delete and bulk delete",
-                  "status": "todo"
+                  "status": "done"
                 }
               ]
             },
             {
               "id": "wf-2-27",
               "title": "Builder image field integration with Media library picker",
-              "status": "todo",
+              "status": "done",
               "subItems": [
                 {
                   "id": "wf-2-27-1",
                   "title": "Add 'Choose from Media' and 'Upload new' actions in Step 2 image forms",
-                  "status": "todo"
+                  "status": "done"
                 },
                 {
                   "id": "wf-2-27-2",
                   "title": "Reuse one media modal across click-to-edit and block settings image workflows",
-                  "status": "todo"
+                  "status": "done"
                 },
                 {
                   "id": "wf-2-27-3",
                   "title": "Keep direct URL input as fallback for external asset links",
-                  "status": "todo"
+                  "status": "done"
                 }
               ]
             }

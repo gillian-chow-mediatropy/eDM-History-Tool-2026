@@ -22,8 +22,53 @@ function extensionOf(fileName = "") {
     return String(fileName).slice(dot + 1).toLowerCase();
 }
 
+function mediaKindOf(item) {
+    const mime = String(item?.mimeType || "").toLowerCase();
+    if (mime.startsWith("image/")) return "image";
+    if (mime.startsWith("video/")) return "video";
+    if (
+        mime.includes("pdf")
+        || mime.includes("word")
+        || mime.includes("officedocument")
+        || mime.includes("excel")
+        || mime.includes("powerpoint")
+        || mime.includes("text/")
+        || mime.includes("csv")
+    ) {
+        return "document";
+    }
+    return "other";
+}
+
 function normalizeIds(items = []) {
     return [...new Set(items.map((item) => String(item || "").trim()).filter(Boolean))];
+}
+
+function matchesTypeFilter(item, filter) {
+    const typeFilter = String(filter || "all").toLowerCase();
+    if (typeFilter === "all") return true;
+    const kind = mediaKindOf(item);
+    if (typeFilter === "image" || typeFilter === "video" || typeFilter === "document") {
+        return kind === typeFilter;
+    }
+    const ext = extensionOf(item?.fileName || "");
+    return ext === typeFilter;
+}
+
+function MediaPreview({ item, alt = "Media asset" }) {
+    const ext = (extensionOf(item?.fileName || "") || "FILE").toUpperCase();
+    const kind = mediaKindOf(item);
+    if (kind === "image") {
+        return <img src={item?.url} alt={alt} loading="lazy" />;
+    }
+    if (kind === "video") {
+        return <video src={item?.url} muted playsInline preload="metadata" controls={false} />;
+    }
+    return (
+        <div className="media-file-fallback">
+            <span>{ext}</span>
+        </div>
+    );
 }
 
 export default function MediaPage() {
@@ -91,9 +136,7 @@ export default function MediaPage() {
     const filteredMedia = useMemo(() => {
         const keyword = String(search || "").trim().toLowerCase();
         return mediaItems.filter((item) => {
-            const fileName = String(item?.fileName || "");
-            const ext = extensionOf(fileName);
-            const typeMatch = typeFilter === "all" ? true : ext === typeFilter;
+            const typeMatch = matchesTypeFilter(item, typeFilter);
             if (!typeMatch) return false;
             if (!keyword) return true;
             const haystack = [
@@ -333,12 +376,28 @@ export default function MediaPage() {
                             className="media-filter-select"
                         >
                             <option value="all">All types</option>
+                            <option value="image">Images</option>
+                            <option value="video">Videos</option>
+                            <option value="document">Documents</option>
                             <option value="jpg">JPG</option>
                             <option value="jpeg">JPEG</option>
                             <option value="png">PNG</option>
                             <option value="gif">GIF</option>
                             <option value="webp">WEBP</option>
                             <option value="svg">SVG</option>
+                            <option value="mp4">MP4</option>
+                            <option value="webm">WEBM</option>
+                            <option value="mov">MOV</option>
+                            <option value="m4v">M4V</option>
+                            <option value="pdf">PDF</option>
+                            <option value="doc">DOC</option>
+                            <option value="docx">DOCX</option>
+                            <option value="xls">XLS</option>
+                            <option value="xlsx">XLSX</option>
+                            <option value="ppt">PPT</option>
+                            <option value="pptx">PPTX</option>
+                            <option value="txt">TXT</option>
+                            <option value="csv">CSV</option>
                         </select>
                     </div>
                     <div className="media-toolbar-actions">
@@ -351,7 +410,7 @@ export default function MediaPage() {
                                     key={uploadInputKey}
                                     ref={uploadInputRef}
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
                                     multiple
                                     onChange={(event) => uploadMediaFiles(event.target.files)}
                                     style={{ display: "none" }}
@@ -420,7 +479,7 @@ export default function MediaPage() {
                                                     className="media-tile-preview"
                                                     onClick={() => setSelectedMediaId(id)}
                                                 >
-                                                    <img src={item.url} alt={item.fileName || "Media asset"} loading="lazy" />
+                                                    <MediaPreview item={item} alt={item.fileName || "Media asset"} />
                                                 </button>
                                                 <div className="media-tile-meta">
                                                     <p className="media-tile-name" title={item.fileName}>{item.fileName}</p>
@@ -434,7 +493,7 @@ export default function MediaPage() {
                                                             className={`media-tile-check ${isChecked ? "is-checked" : ""}`}
                                                             onClick={() => toggleMediaSelection(id)}
                                                         >
-                                                            {isChecked ? "✓" : ""}
+                                                            {isChecked ? "X" : ""}
                                                         </button>
                                                     )}
                                                 </div>
@@ -452,7 +511,7 @@ export default function MediaPage() {
                             ) : (
                                 <>
                                     <div className="media-detail-preview">
-                                        <img src={selectedItem.url} alt={selectedItem.fileName || "Media"} />
+                                        <MediaPreview item={selectedItem} alt={selectedItem.fileName || "Media"} />
                                     </div>
 
                                     <div className="grid gap-3 mt-3">
